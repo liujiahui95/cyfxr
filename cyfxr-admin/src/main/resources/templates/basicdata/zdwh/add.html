@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('新增岗位')"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-post-add">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">序号：</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="text" name="id" id="id" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">电报码：</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="text" name="dbm" id="dbm" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label ">站段名称：</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="text" name="mc" id="mc" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">范围电报码：</label>
+            <div class="col-sm-8">
+                <textarea id="fwdbm" name="fwdbm" class="form-control"></textarea>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer"/>
+<script type="text/javascript">
+    var prefix = ctx + "basicdata";
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/addzd", $('#form-post-add').serialize());
+        }
+    }
+</script>
+</body>
+</html>

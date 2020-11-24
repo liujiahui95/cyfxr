@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('承运清算台账表分品类')"/>
+    <script th:src="@{/js/global/cyfxSelect.js}"></script>
+    <script th:src="@{/js/global/initDate.js}"></script>
+
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="post-form" autocomplete="off">
+                <div class="select-list">
+                    <ul>
+                        <li class="select-time">
+                            <label>请选择时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="KSRQ"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间"
+                                   name="JSRQ"/>
+                        </li>
+                        <li>
+                            <label>请选择单位： </label>
+                            <select id="dw" name="dw">
+                                <option data-hidden="true" value="">请选单位</option>
+                                <option value="0">全部</option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>请选择车站： </label>
+                            <select id="cz" name="cz">
+                                <option data-hidden="true" value="">请选择车站</option>
+                                <option value="0">全部</option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>请选择到局： </label>
+                            <select id="jm" name="jm">
+                                <option data-hidden="true" value="">请选择到局</option>
+                                <option value="0">全部</option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>计量单位： </label>
+                            <label class="radio-box"> <input style="width: 40px" type="radio" name="jldw" value="0"
+                                                             checked/> 万元 </label>
+                            <label class="radio-box"> <input style="width: 40px" type="radio" name="jldw" value="1"/> 元
+                            </label>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="importExcel()">
+                <i class="fa fa-plus"></i> 导出
+            </a>
+        </div>
+
+        <div class="col-sm-12 select-table table-bordered">
+            <table id="bootstrap-table" data-height="550" style="white-space: nowrap"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var prefix = ctx + "cyfx";
+
+    $(function () {
+        var options = {
+            url: prefix + "/fb7_pl",
+            firstLoad: false, // 是否首次请求加载数据
+            modalName: "承运清算台账表分品类",
+            showExport: true,
+            columns: [
+                [
+                    {field: "0", title: "序号", align: "center", colspan: 1, rowspan: 3},
+                    {field: "1", title: "类型", align: "center", colspan: 1, rowspan: 3},
+                    {field: "2", title: "发送量<br>(吨)", align: "center", colspan: 1, rowspan: 3},
+                    {field: "3", title: "发送车数<br>(车)", align: "center", colspan: 1, rowspan: 3},
+                    {field: "4", title: "运费收入", align: "center", colspan: 1, rowspan: 3},
+                    {field: "", title: "其中:", align: "center", colspan: 9, rowspan: 1},
+                    {field: "14", title: "全程计费周转量", align: "center", colspan: 1, rowspan: 3},
+                    {field: "", title: "其中：", align: "center", colspan: 6, rowspan: 1},
+                    {field: "21", title: "本企业<br>承运付费支出", align: "center", colspan: 1, rowspan: 3},
+                    {field: "", title: "其中:", align: "center", colspan: 36, rowspan: 1},
+                    {field: "", title: "每万吨公里承运付费率", align: "center", colspan: 13, rowspan: 1},
+                    {field: "", title: "每运费收入付费率(%)", align: "center", colspan: 13, rowspan: 1}
+                ],
+                [
+                    {field: "5", title: "基准运费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "6", title: "自收自高出运费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "7", title: "付本局其他企业高出运费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中:", align: "center", colspan: 5, rowspan: 1},
+                    {field: "13", title: "付外局高出运费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "15", title: "国铁区段周转量", align: "center", colspan: 1, rowspan: 2},
+                    {field: "16", title: "乌准公司周转量", align: "center", colspan: 1, rowspan: 2},
+                    {field: "17", title: "奎北公司周转量", align: "center", colspan: 1, rowspan: 2},
+                    {field: "18", title: "库俄公司周转量", align: "center", colspan: 1, rowspan: 2},
+                    {field: "19", title: "哈罗公司周转量", align: "center", colspan: 1, rowspan: 2},
+                    {field: "20", title: "经外局周转量", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "分付费项目", align: "center", colspan: 6, rowspan: 1},
+                    {field: "", title: "国铁", align: "center", colspan: 5, rowspan: 1},
+                    {field: "", title: "乌准公司", align: "center", colspan: 5, rowspan: 1},
+                    {field: "", title: "奎北公司", align: "center", colspan: 5, rowspan: 1},
+                    {field: "", title: "库俄公司", align: "center", colspan: 5, rowspan: 1},
+                    {field: "", title: "哈罗公司", align: "center", colspan: 5, rowspan: 1},
+                    {field: "", title: "其他企业", align: "center", colspan: 5, rowspan: 1},
+                    {field: "58", title: "机车牵引费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中:", align: "center", colspan: 2, rowspan: 1},
+                    {field: "61", title: "线路使用费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中:", align: "center", colspan: 2, rowspan: 1},
+                    {field: "64", title: "车辆服务费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中:", align: "center", colspan: 2, rowspan: 1},
+                    {field: "67", title: "到达服务费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中:", align: "center", colspan: 2, rowspan: 1},
+                    {field: "70", title: "综合服务费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "71", title: "机车牵引费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中:", align: "center", colspan: 2, rowspan: 1},
+                    {field: "74", title: "线路使用费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中:", align: "center", colspan: 2, rowspan: 1},
+                    {field: "77", title: "车辆服务费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中:", align: "center", colspan: 2, rowspan: 1},
+                    {field: "80", title: "到达服务费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中:", align: "center", colspan: 2, rowspan: 1},
+                    {field: "83", title: "综合服务费", align: "center", colspan: 1, rowspan: 2}
+                ],
+                [
+                    {field: "8", title: "国铁", align: "center", colspan: 1, rowspan: 1},
+                    {field: "9", title: "乌准公司", align: "center", colspan: 1, rowspan: 1},
+                    {field: "10", title: "奎北公司", align: "center", colspan: 1, rowspan: 1},
+                    {field: "11", title: "库俄公司", align: "center", colspan: 1, rowspan: 1},
+                    {field: "12", title: "哈罗公司", align: "center", colspan: 1, rowspan: 1},
+                    {field: "22", title: "内燃机车牵引费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "23", title: "电力机车牵引费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "24", title: "线路使用费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "25", title: "车辆服务费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "26", title: "到达服务费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "27", title: "综合服务费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "28", title: "内燃机车牵引费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "29", title: "电力机车牵引费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "30", title: "线路使用费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "31", title: "车辆服务费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "32", title: "到达服务费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "33", title: "内燃机车牵引费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "34", title: "电力机车牵引费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "35", title: "线路使用费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "36", title: "车辆服务费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "37", title: "到达服务费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "38", title: "内燃机车牵引费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "39", title: "电力机车牵引费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "40", title: "线路使用费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "41", title: "车辆服务费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "42", title: "到达服务费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "43", title: "内燃机车牵引费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "44", title: "电力机车牵引费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "45", title: "线路使用费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "46", title: "车辆服务费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "47", title: "到达服务费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "48", title: "内燃机车牵引费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "49", title: "电力机车牵引费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "50", title: "线路使用费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "51", title: "车辆服务费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "52", title: "到达服务费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "53", title: "内燃机车牵引费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "54", title: "电力机车牵引费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "55", title: "线路使用费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "56", title: "车辆服务费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "57", title: "到达服务费", align: "center", colspan: 1, rowspan: 1},
+                    {field: "59", title: "付本局", align: "center", colspan: 1, rowspan: 1},
+                    {field: "60", title: "付外局", align: "center", colspan: 1, rowspan: 1},
+                    {field: "62", title: "付本局", align: "center", colspan: 1, rowspan: 1},
+                    {field: "63", title: "付外局", align: "center", colspan: 1, rowspan: 1},
+                    {field: "65", title: "付本局", align: "center", colspan: 1, rowspan: 1},
+                    {field: "66", title: "付外局", align: "center", colspan: 1, rowspan: 1},
+                    {field: "68", title: "付本局", align: "center", colspan: 1, rowspan: 1},
+                    {field: "69", title: "付外局", align: "center", colspan: 1, rowspan: 1},
+                    {field: "72", title: "付本局", align: "center", colspan: 1, rowspan: 1},
+                    {field: "73", title: "付外局", align: "center", colspan: 1, rowspan: 1},
+                    {field: "75", title: "付本局", align: "center", colspan: 1, rowspan: 1},
+                    {field: "76", title: "付外局", align: "center", colspan: 1, rowspan: 1},
+                    {field: "78", title: "付本局", align: "center", colspan: 1, rowspan: 1},
+                    {field: "79", title: "付外局", align: "center", colspan: 1, rowspan: 1},
+                    {field: "81", title: "付本局", align: "center", colspan: 1, rowspan: 1},
+                    {field: "82", title: "付外局", align: "center", colspan: 1, rowspan: 1}
+                ]
+            ]
+        };
+        $.table.init(options);
+        getHyqy();
+        getJm();
+        $("#dw").change(function () {
+            getCz();
+        });
+        initDate();
+    });
+
+</script>
+</body>
+</html>

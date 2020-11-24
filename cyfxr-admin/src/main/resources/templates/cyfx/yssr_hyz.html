@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('运输收入汇总表')"/>
+    <th:block th:include="include :: datetimepicker-css"/>
+    <script th:src="@{/js/global/datetimepicker_month.js}"></script>
+    <script th:src="@{/js/global/dwSelect_hyzx.js}"></script>
+    <script th:src="@{/js/global/initDate.js}"></script>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="post-form" autocomplete="off">
+                <div class="select-list">
+                    <ul>
+                        <li class="select-time">
+                            <label>请选择时间： </label>
+                            <input type="text" class="time-input2" id="startTime1" name="KSRQ" placeholder="开始日期"/>
+                            <span>到</span>
+                            <input type="text" class="time-input2" id="endTime1" name="JSRQ" placeholder="结束日期"/>
+                        </li>
+                        <li>
+                            <label>请选择单位： </label>
+                            <select id="dw" name="dw">
+                                <option data-hidden="true" value="">请选单位</option>
+                                <option value="0">全部</option>
+                            </select>
+                        </li>
+                        <li>
+                            <label class="radio-box"> <input style="width: 40px" type="radio" name="jldw" value="0"
+                                                             checked/> 万元 </label>
+                            <label class="radio-box"> <input style="width: 40px" type="radio" name="jldw" value="1"/> 元
+                            </label>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="importExcel()">
+                <i class="fa fa-plus"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-bordered">
+            <table id="bootstrap-table" data-height="550" style="white-space: nowrap"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: datetimepicker-js"/>
+<script th:inline="javascript">
+    var prefix = ctx + "cyfx";
+
+    $(function () {
+        var options = {
+            url: prefix + "/yssr_hz",
+            firstLoad: false, // 是否首次请求加载数据
+            modalName: "运输收入汇总表",
+            showExport: true,
+            pagination: false,
+            columns: [
+                [
+                    {field: "0", title: "序号", align: "center", colspan: 1, rowspan: 2},
+                    {field: "1", title: "单位", align: "center", colspan: 1, rowspan: 2},
+                    {field: "2", title: "车站", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "2019年", align: "center", colspan: 5, rowspan: 1},
+                    {field: "", title: "2020年预算", align: "center", colspan: 5, rowspan: 1},
+                    {field: "", title: "2020年预算进度", align: "center", colspan: 5, rowspan: 1},
+                    {field: "", title: "2020年实际", align: "center", colspan: 5, rowspan: 1}
+                ],
+                [
+
+                    {field: "3", title: "货物发送量（万人）", align: "center", colspan: 1, rowspan: 1},
+                    {field: "4", title: "货物运费收入", align: "center", colspan: 1, rowspan: 1},
+                    {field: "5", title: "货运其他收入", align: "center", colspan: 1, rowspan: 1},
+                    {field: "6", title: "建设基金收入", align: "center", colspan: 1, rowspan: 1},
+                    {field: "7", title: "小计", align: "center", colspan: 1, rowspan: 1},
+
+                    {field: "8", title: "货物发送量（万人）", align: "center", colspan: 1, rowspan: 1},
+                    {field: "9", title: "货物运费收入", align: "center", colspan: 1, rowspan: 1},
+                    {field: "10", title: "货运其他收入", align: "center", colspan: 1, rowspan: 1},
+                    {field: "11", title: "建设基金收入", align: "center", colspan: 1, rowspan: 1},
+                    {field: "12", title: "小计", align: "center", colspan: 1, rowspan: 1},
+
+                    {field: "13", title: "货物发送量（万人）", align: "center", colspan: 1, rowspan: 1},
+                    {field: "14", title: "货物运费收入", align: "center", colspan: 1, rowspan: 1},
+                    {field: "15", title: "货运其他收入", align: "center", colspan: 1, rowspan: 1},
+                    {field: "16", title: "建设基金收入", align: "center", colspan: 1, rowspan: 1},
+                    {field: "17", title: "小计", align: "center", colspan: 1, rowspan: 1},
+
+                    {field: "18", title: "货物发送量（万人）", align: "center", colspan: 1, rowspan: 1},
+                    {field: "19", title: "货物运费收入", align: "center", colspan: 1, rowspan: 1},
+                    {field: "20", title: "货运其他收入", align: "center", colspan: 1, rowspan: 1},
+                    {field: "21", title: "建设基金收入", align: "center", colspan: 1, rowspan: 1},
+                    {field: "22", title: "小计", align: "center", colspan: 1, rowspan: 1}
+                ]
+            ]
+        };
+        $.table.init(options);
+        formatYyyyMm();
+        getHyzx();
+        initDateYYMM();
+    });
+
+</script>
+</body>
+</html>

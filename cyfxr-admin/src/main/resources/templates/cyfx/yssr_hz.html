@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('运输收入汇总表')"/>
+    <th:block th:include="include :: datetimepicker-css"/>
+    <script th:src="@{/js/global/datetimepicker_month.js}"></script>
+    <script th:src="@{/js/global/initDate.js}"></script>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="post-form" autocomplete="off">
+                <div class="select-list">
+                    <ul>
+                        <li class="select-time">
+                            <label>请选择时间： </label>
+                            <input type="text" class="time-input2" id="startTime1" name="KSRQ" placeholder="开始日期"/>
+                            <span>到</span>
+                            <input type="text" class="time-input2" id="endTime1" name="JSRQ" placeholder="结束日期"/>
+                        </li>
+
+                        <li>
+                            <label class="radio-box"> <input style="width: 40px" type="radio" name="jldw" value="0"
+                                                             checked/> 万元 </label>
+                            <label class="radio-box"> <input style="width: 40px" type="radio" name="jldw" value="1"/> 元
+                            </label>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="importExcel()">
+                <i class="fa fa-plus"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-bordered">
+            <table id="bootstrap-table" data-height="550" style="white-space: nowrap"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<th:block th:include="include :: datetimepicker-js"/>
+<script th:inline="javascript">
+    var prefix = ctx + "cyfx";
+
+    $(function () {
+        var options = {
+            url: prefix + "/yssr_hz",
+            firstLoad: false, // 是否首次请求加载数据
+            modalName: "运输收入汇总表",
+            showExport: true,
+            pagination: false,
+            columns: [
+                [
+                    {field: "0", title: "序号", align: "right", colspan: 1, rowspan: 2},
+                    {field: "1", title: "项目", align: "left", colspan: 1, rowspan: 2},
+                    {field: "2", title: "计量单位", align: "left", colspan: 1, rowspan: 2},
+                    {field: "", title: "上期", align: "center", colspan: 3, rowspan: 1},
+                    {field: "", title: "本期年度预算", align: "center", colspan: 3, rowspan: 1},
+                    {field: "", title: "本期目标预算时间进度", align: "center", colspan: 3, rowspan: 1},
+                    {field: "", title: "本期", align: "center", colspan: 3, rowspan: 1},
+                    {field: "", title: "较时间进度增减", align: "center", colspan: 3, rowspan: 1}
+                ],
+                [
+                    {field: "3", title: "工作量", align: "right", colspan: 1, rowspan: 1},
+                    {field: "4", title: "金额", align: "right", colspan: 1, rowspan: 1},
+                    {field: "5", title: "收入率", align: "right", colspan: 1, rowspan: 1},
+                    {field: "6", title: "工作量", align: "right", colspan: 1, rowspan: 1},
+                    {field: "7", title: "金额", align: "right", colspan: 1, rowspan: 1},
+                    {field: "8", title: "收入率", align: "right", colspan: 1, rowspan: 1},
+                    {field: "9", title: "工作量", align: "right", colspan: 1, rowspan: 1},
+                    {field: "10", title: "金额", align: "right", colspan: 1, rowspan: 1},
+                    {field: "11", title: "收入率", align: "right", colspan: 1, rowspan: 1},
+                    {field: "12", title: "工作量", align: "right", colspan: 1, rowspan: 1},
+                    {field: "13", title: "金额", align: "right", colspan: 1, rowspan: 1},
+                    {field: "14", title: "收入率", align: "right", colspan: 1, rowspan: 1},
+                    {field: "15", title: "工作量", align: "right", colspan: 1, rowspan: 1},
+                    {field: "16", title: "金额", align: "right", colspan: 1, rowspan: 1},
+                    {field: "17", title: "收入率", align: "right", colspan: 1, rowspan: 1}
+                ]
+            ]
+        };
+        $.table.init(options);
+        formatYyyyMm();
+        initDateYYMM();
+    });
+
+</script>
+</body>
+</html>

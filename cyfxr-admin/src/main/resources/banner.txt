@@ -1,0 +1,3 @@
+Application Version: ${cyfxr.version}
+Spring Boot Version: ${spring-boot.version}
+

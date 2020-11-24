@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('承运汇总表')"/>
+    <script th:src="@{/js/global/initDate.js}"></script>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="post-form" autocomplete="off">
+                <div class="select-list">
+                    <ul>
+                        <li class="select-time">
+                            <label>请选择时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="KSRQ"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间"
+                                   name="JSRQ"/>
+                        </li>
+
+                        <li>
+                            <label>计量单位： </label>
+                            <label class="radio-box"> <input style="width: 40px" type="radio" name="jldw" value="0"
+                                                             checked/> 万元 </label>
+                            <label class="radio-box"> <input style="width: 40px" type="radio" name="jldw" value="1"/> 元
+                            </label>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="$.table .exportCyfxExcel('fb1')">
+                <i class="fa fa-plus"></i> 导出
+            </a>
+        </div>
+
+        <div class="col-sm-12 select-table table-bordered">
+            <table id="bootstrap-table" data-height="550" style="white-space: nowrap"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var prefix = ctx + "cyfx";
+
+    $(function () {
+        var options = {
+            url: prefix + "/fb1",
+            firstLoad: false, // 是否首次请求加载数据
+            modalName: "承运汇总表",
+            showExport: true,
+            pagination: false,
+            columns: [
+                {field: "0", title: "序号", align: "center"},
+                {field: "1", title: "承运企业", align: "center"},
+                {field: "2", title: "发送量<br>(吨)", align: "center"},
+                {field: "3", title: "发送车数<br>(车)", align: "center"},
+                {field: "4", title: "全程计费周转量<br>(吨公里)", align: "center"},
+                {field: "5", title: "车流径路周转量<br>(吨公里)", align: "center"},
+                {field: "6", title: "运费收入", align: "center"},
+                {field: "7", title: "承运收入", align: "center"},
+                {field: "8", title: "承运付费", align: "center"},
+                {field: "9", title: "本企业<br>承运服务收入", align: "center"},
+                {field: "10", title: "本企业<br>货票盈余", align: "center"},
+                {field: "11", title: "本企业<br>承运票盈余", align: "center"},
+                {field: "12", title: "计费<br>吨公里运费", align: "center"},
+                {field: "13", title: "本企业<br>货票盈余率", align: "center"},
+                {field: "14", title: "本企业<br>货票运费盈余率", align: "center"},
+                {field: "15", title: "本企业<br>承运盈余率", align: "center"},
+                {field: "16", title: "本企业<br>承运运费盈余率", align: "center"},
+                {field: "17", title: "本企业<br>单车货票盈余率", align: "center"},
+                {field: "18", title: "本企业<br>单车承运盈余", align: "center"},
+            ]
+        };
+        $.table.init(options);
+        initDate();
+    });
+
+</script>
+</body>
+</html>

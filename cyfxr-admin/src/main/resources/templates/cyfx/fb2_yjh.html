@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('承运汇总表分运价号')"/>
+    <script th:src="@{/js/global/cyfxSelect.js}"></script>
+    <script th:src="@{/js/global/initDate.js}"></script>
+
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="post-form" autocomplete="off">
+                <div class="select-list">
+                    <ul>
+                        <li class="select-time">
+                            <label>请选择时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="KSRQ"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间"
+                                   name="JSRQ"/>
+                        </li>
+                        <li>
+                            <label>请选择单位： </label>
+                            <select id="dw" name="dw">
+                                <option data-hidden="true" value="">请选单位</option>
+                                <option value="0">全部</option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>请选择车站： </label>
+                            <select id="cz" name="cz">
+                                <option data-hidden="true" value="">请选择车站</option>
+                                <option value="0">全部</option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>请选择到局： </label>
+                            <select id="jm" name="jm">
+                                <option data-hidden="true" value="">请选择到局</option>
+                                <option value="0">全部</option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>计量单位： </label>
+                            <label class="radio-box"> <input style="width: 40px" type="radio" name="jldw" value="0"
+                                                             checked/> 万元 </label>
+                            <label class="radio-box"> <input style="width: 40px" type="radio" name="jldw" value="1"/> 元
+                            </label>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="importExcel()">
+                <i class="fa fa-plus"></i> 导出
+            </a>
+        </div>
+
+        <div class="col-sm-12 select-table table-bordered">
+            <table id="bootstrap-table" data-height="550" style="white-space: nowrap"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var prefix = ctx + "cyfx";
+
+    $(function () {
+        var options = {
+            url: prefix + "/fb2_yjh",
+            firstLoad: false, // 是否首次请求加载数据
+            modalName: "承运汇总表分运价号",
+            showExport: true,
+            pagination: false,
+            columns: [
+                [
+                    {field: "0", title: "序号", align: "center", colspan: 1, rowspan: 2},
+                    {field: "1", title: "承运企业", align: "center", colspan: 1, rowspan: 2},
+                    {field: "2", title: "发送量<br>(吨)", align: "center", colspan: 1, rowspan: 2},
+                    {field: "3", title: "发送车数<br>(车)", align: "center", colspan: 1, rowspan: 2},
+                    {field: "4", title: "全程计费周转量<br>(吨公里)", align: "center", colspan: 1, rowspan: 2},
+                    {field: "5", title: "车流径路周转量<br>(吨公里)", align: "center", colspan: 1, rowspan: 2},
+                    {field: "6", title: "运费收入", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中:", align: "center", colspan: 4, rowspan: 1},
+                    {field: "11", title: "承运收入", align: "center", colspan: 1, rowspan: 2},
+                    {field: "12", title: "承运付费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中:取得承运服务收入企业", align: "center", colspan: 6, rowspan: 1},
+                    {field: "19", title: "本企业<br>取得服务收入", align: "center", colspan: 1, rowspan: 2},
+                    {field: "20", title: "全局<br>取得服务收入", align: "center", colspan: 1, rowspan: 2},
+                    {field: "21", title: "本企业<br>货票盈余", align: "center", colspan: 1, rowspan: 2},
+                    {field: "22", title: "全局<br>承运盈余", align: "center", colspan: 1, rowspan: 2},
+                    {field: "23", title: "计费<br>吨公里运费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "24", title: "本企业<br>货票盈余率", align: "center", colspan: 1, rowspan: 2},
+                    {field: "25", title: "本企业<br>货票运费盈余率", align: "center", colspan: 1, rowspan: 2},
+                    {field: "26", title: "全局<br>承运盈余率", align: "center", colspan: 1, rowspan: 2},
+                    {field: "27", title: "全局<br>承运运费盈余率", align: "center", colspan: 1, rowspan: 2},
+                    {field: "28", title: "本企业<br>单车货票盈余", align: "center", colspan: 1, rowspan: 2},
+                    {field: "29", title: "全局<br>单车承运盈余", align: "center", colspan: 1, rowspan: 2}
+                ],
+                [
+                    {field: "7", title: "基准运费", align: "center"},
+                    {field: "8", title: "自收高出运费", align: "center"},
+                    {field: "9", title: "付本局<br>其他企业高出运费", align: "center"},
+                    {field: "10", title: "付外局<br>高出运费", align: "center"},
+                    {field: "13", title: "国铁", align: "center"},
+                    {field: "14", title: "乌准", align: "center"},
+                    {field: "15", title: "奎北", align: "center"},
+                    {field: "16", title: "库俄", align: "center"},
+                    {field: "17", title: "哈罗", align: "center"},
+                    {field: "18", title: "外局", align: "center"}
+                ]
+            ]
+        };
+        $.table.init(options);
+        getHyqy();
+        getJm();
+        $("#dw").change(function () {
+            getCz();
+        });
+        initDate();
+    });
+
+</script>
+</body>
+</html>

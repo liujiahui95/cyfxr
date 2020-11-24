@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('承运收益明细分到局')"/>
+    <script th:src="@{/js/global/cyfxSelect.js}"></script>
+    <script th:src="@{/js/global/initDate.js}"></script>
+
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="post-form" autocomplete="off">
+                <div class="select-list">
+                    <ul>
+                        <li class="select-time">
+                            <label>请选择时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间"
+                                   name="KSRQ"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间"
+                                   name="JSRQ"/>
+                        </li>
+                        <li>
+                            <label>请选择单位： </label>
+                            <select id="dw" name="dw">
+                                <option data-hidden="true" value="">请选单位</option>
+                                <option value="0">全部</option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>请选择车站： </label>
+                            <select id="cz" name="cz">
+                                <option data-hidden="true" value="">请选择车站</option>
+                                <option value="0">全部</option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>计量单位： </label>
+                            <label class="radio-box"> <input style="width: 40px" type="radio" name="jldw" value="0"
+                                                             checked/> 万元 </label>
+                            <label class="radio-box"> <input style="width: 40px" type="radio" name="jldw" value="1"/> 元
+                            </label>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="importExcel()">
+                <i class="fa fa-plus"></i> 导出
+            </a>
+        </div>
+
+        <div class="col-sm-12 select-table table-bordered">
+            <table id="bootstrap-table" data-height="550" style="white-space: nowrap"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var prefix = ctx + "cyfx";
+
+    $(function () {
+        var options = {
+            url: prefix + "/fb3_dj",
+            firstLoad: false, // 是否首次请求加载数据
+            modalName: "承运收益明细分到局",
+            showExport: true,
+            pagination: false,
+            columns: [
+                [
+                    {field: "0", title: "序号", align: "center", colspan: 1, rowspan: 3},
+                    {field: "1", title: "到局", align: "center", colspan: 1, rowspan: 3},
+                    {field: "2", title: "发送量<br>(吨)", align: "center", colspan: 1, rowspan: 3},
+                    {field: "3", title: "发送车数<br>(车)", align: "center", colspan: 1, rowspan: 3},
+                    {field: "4", title: "运费收入", align: "center", colspan: 1, rowspan: 3},
+                    {field: "5", title: "全程计费周转量<br>(吨公里)", align: "center", colspan: 1, rowspan: 3},
+                    {field: "", title: "其中:", align: "center", colspan: 2, rowspan: 1},
+                    {field: "8", title: "全程实际周转量<br>(吨公里)", align: "center", colspan: 1, rowspan: 3},
+                    {field: "", title: "其中：", align: "center", colspan: 2, rowspan: 1},
+                    {field: "11", title: "本企业<br>承运付费支出", align: "center", colspan: 1, rowspan: 3},
+                    {field: "", title: "其中:", align: "center", colspan: 15, rowspan: 1},
+                    {field: "27", title: "本企业<br>承运服务收入", align: "center", colspan: 1, rowspan: 3},
+                    {field: "", title: "其中：", align: "center", colspan: 23, rowspan: 1},
+                    {field: "21", title: "每万吨公里承运付费率(按计费周转量)", align: "center", colspan: 5, rowspan: 1},
+                    {field: "22", title: "每运费收入付费率(%)", align: "center", colspan: 5, rowspan: 1},
+                    {field: "23", title: "每万吨公里服务收入率(按计费周转量)", align: "center", colspan: 5, rowspan: 1}
+                ],
+                [
+                    {field: "6", title: "经本企业<br>(吨公里)", align: "center", colspan: 1, rowspan: 2},
+                    {field: "7", title: "经全局<br>(吨公里)", align: "center", colspan: 1, rowspan: 2},
+                    {field: "9", title: "经本企业<br>(吨公里)", align: "center", colspan: 1, rowspan: 2},
+                    {field: "10", title: "经全局<br>(吨公里)", align: "center", colspan: 1, rowspan: 2},
+                    {field: "12", title: "机车牵引费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中：", align: "center", colspan: 2, rowspan: 1},
+                    {field: "15", title: "线路使用费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中：", align: "center", colspan: 4, rowspan: 1},
+                    {field: "20", title: "车辆服务费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "21", title: "到达服务费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中：", align: "center", colspan: 4, rowspan: 1},
+                    {field: "26", title: "综合服务费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "28", title: "机车牵引费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中：", align: "center", colspan: 2, rowspan: 1},
+                    {field: "31", title: "线路使用费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中：", align: "center", colspan: 4, rowspan: 1},
+                    {field: "36", title: "车辆服务费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "37", title: "到达服务费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中：", align: "center", colspan: 4, rowspan: 1},
+                    {field: "42", title: "中转服务费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中：", align: "center", colspan: 2, rowspan: 1},
+                    {field: "45", title: "集装箱使用费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "", title: "其中：", align: "center", colspan: 3, rowspan: 1},
+                    {field: "49", title: "篷布使用费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "50", title: "空车走行<br>补偿费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "51", title: "内燃机车<br>牵引费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "52", title: "电力机车<br>牵引费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "53", title: "线路使用费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "54", title: "车辆服务费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "55", title: "到达服务费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "56", title: "内燃机车<br>牵引费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "57", title: "电力机车<br>牵引费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "58", title: "线路使用费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "59", title: "车辆服务费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "60", title: "到达服务费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "61", title: "内燃机车<br>牵引费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "62", title: "电力机车<br>牵引费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "63", title: "线路使用费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "64", title: "车辆服务费", align: "center", colspan: 1, rowspan: 2},
+                    {field: "65", title: "到达服务费", align: "center", colspan: 1, rowspan: 2}
+                ],
+                [
+                    {field: "13", title: "机车牵引费<br>(内燃)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "14", title: "机车牵引费<br>(电力)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "16", title: "线路使用费<br>(特类)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "17", title: "线路使用费<br>(一类)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "18", title: "线路使用费<br>(二类)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "19", title: "线路使用费<br>(三类)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "22", title: "到达服务费<br>(整)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "23", title: "到达服务费<br>(批)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "24", title: "到达服务费<br>(零)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "25", title: "到达服务费<br>(集)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "29", title: "机车牵引费<br>(内燃)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "30", title: "机车牵引费<br>(电力)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "32", title: "线路使用费<br>(特类)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "33", title: "线路使用费<br>(一类)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "34", title: "线路使用费<br>(二类)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "35", title: "线路使用费<br>(三类)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "38", title: "到达服务费<br>(整)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "39", title: "到达服务费<br>(批)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "40", title: "到达服务费<br>(零)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "41", title: "到达服务费<br>(集)", align: "center", colspan: 1, rowspan: 1},
+                    {field: "43", title: "有调", align: "center", colspan: 1, rowspan: 1},
+                    {field: "44", title: "无调", align: "center", colspan: 1, rowspan: 1},
+                    {field: "46", title: "40(45)英尺", align: "center", colspan: 1, rowspan: 1},
+                    {field: "47", title: "35吨敞口箱", align: "center", colspan: 1, rowspan: 1},
+                    {field: "48", title: "其他箱", align: "center", colspan: 1, rowspan: 1}
+                ]
+            ]
+        };
+        $.table.init(options);
+        getHyqy();
+        $("#dw").change(function () {
+            getCz();
+        });
+        initDate();
+    });
+
+</script>
+</body>
+</html>

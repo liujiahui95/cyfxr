@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('新增站名')"/>
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content" style="width: 600px; height: 400px">
+    <form class="form-horizontal m" id="form-zm-add">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">站名：</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="text" name="zm" id="zm" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label ">电报码：</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="text" name="dbm" id="dbm" required>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="include :: footer"/>
+<script type="text/javascript">
+    var prefix = ctx + "basicdata";
+
+    $("#form-zm-add").validate({
+        onkeyup: false,
+        rules: {
+            zm: {
+                remote: {
+                    url: ctx + "basicdata/checkZMUnique",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        "zm": function () {
+                            return $.common.trim($("#zm").val());
+                        }
+                    },
+                    dataFilter: function (data, type) {
+                        return $.validate.unique(data);
+                    }
+                }
+            },
+            dbm: {
+                remote: {
+                    url: ctx + "basicdata/checkDBMUnique",
+                    type: "post",
+                    dataType: "json",
+                    data: {
+                        "dbm": function () {
+                            return $.common.trim($("#dbm").val());
+                        }
+                    },
+                    dataFilter: function (data, type) {
+                        return $.validate.unique(data);
+                    }
+                }
+            },
+            postSort: {
+                digits: true
+            },
+        },
+        messages: {
+            "dbm": {
+                remote: "电报码已经存在"
+            },
+            "zm": {
+                remote: "站名已经存在"
+            }
+        },
+        focusCleanup: true
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            $.operate.save(prefix + "/addzmk", $('#form-zm-add').serialize());
+        }
+    }
+</script>
+</body>
+</html>

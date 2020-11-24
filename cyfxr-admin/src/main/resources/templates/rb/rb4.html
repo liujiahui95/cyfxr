@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('日报4')"/>
+    <script th:src="@{/js/global/dwselect.js}"></script>
+    <script th:src="@{/js/global/initDate.js}"></script>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="post-form" autocomplete="off">
+                <div class="select-list">
+                    <ul>
+                        <li class="select-time">
+                            <label>请选择时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间" value="2018-02-02"
+                                   name="KSRQ"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间"
+                                   name="JSRQ"/>
+                        </li>
+                        <li>
+                            <label>请选择单位： </label>
+                            <select id="dw" name="dw">
+                                <option data-hidden="true" value="">请选单位</option>
+                                <option value="0">全部</option>
+                            </select>
+                        </li>
+                        <li>
+                            <label>请选择单位： </label>
+                            <select id="cz" class="selectpicker form-control " data-size="10" data-live-search="true"
+                                    name="cz">
+                                <option data-hidden="true" value="">请选择车站</option>
+                                <option value="0">全部</option>
+                            </select>
+                        </li>
+                        <li>
+                            <label class="radio-box"> <input style="width: 40px" type="radio" name="jldw" value="0"
+                                                             checked/> 万元 </label>
+                            <label class="radio-box"> <input style="width: 40px" type="radio" name="jldw" value="1"/> 元
+                            </label>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="importExcel()">
+                <i class="fa fa-plus"></i> 导出
+            </a>
+        </div>
+
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-height="550" style="white-space: nowrap"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer"/>
+<script th:inline="javascript">
+    var prefix = ctx + "rb";
+
+    $(function () {
+        var options = {
+            url: prefix + "/rb4",
+            firstLoad: false, // 是否首次请求加载数据
+            modalName: "日报4",
+            showExport: true,
+            columns: [
+                [
+                    {field: "0", title: "序号", align: "center", colspan: 1, rowspan: 3},
+                    {field: "1", title: "单位名称", align: "center", colspan: 1, rowspan: 3},
+                    {field: "2", title: "计量单位", align: "center", colspan: 1, rowspan: 3},
+                    {field: "", title: "运输收入实际", align: "center", colspan: 9, rowspan: 1},
+                    {field: "", title: "年度计划", align: "center", colspan: 9, rowspan: 1},
+                    {field: "", title: "上年同期", align: "center", colspan: 9, rowspan: 1}
+                ],
+                [
+                    {field: "", title: "当日", align: "center", colspan: 3, rowspan: 1},
+                    {field: "", title: "累计", align: "center", colspan: 3, rowspan: 1},
+                    {field: "", title: "日均", align: "center", colspan: 3, rowspan: 1},
+                    {field: "", title: "年度", align: "center", colspan: 3, rowspan: 1},
+                    {field: "", title: "时间进度", align: "center", colspan: 3, rowspan: 1},
+                    {field: "", title: "日均", align: "center", colspan: 3, rowspan: 1},
+                    {field: "", title: "当日", align: "center", colspan: 3, rowspan: 1},
+                    {field: "", title: "累计", align: "center", colspan: 3, rowspan: 1},
+                    {field: "", title: "日均", align: "center", colspan: 3, rowspan: 1}
+                ],
+                [
+                    {field: "3", title: "工作量", align: "center", colspan: 1, rowspan: 1},
+                    {field: "4", title: "金额", align: "center", colspan: 1, rowspan: 1},
+                    {field: "5", title: "收入率", align: "center", colspan: 1, rowspan: 1},
+                    {field: "6", title: "工作量", align: "center", colspan: 1, rowspan: 1},
+                    {field: "7", title: "金额", align: "center", colspan: 1, rowspan: 1},
+                    {field: "8", title: "收入率", align: "center", colspan: 1, rowspan: 1},
+                    {field: "9", title: "工作量", align: "center", colspan: 1, rowspan: 1},
+                    {field: "10", title: "金额", align: "center", colspan: 1, rowspan: 1},
+                    {field: "11", title: "收入率", align: "center", colspan: 1, rowspan: 1},
+
+
+                    {field: "12", title: "工作量", align: "center", colspan: 1, rowspan: 1},
+                    {field: "13", title: "金额", align: "center", colspan: 1, rowspan: 1},
+                    {field: "14", title: "收入率", align: "center", colspan: 1, rowspan: 1},
+                    {field: "15", title: "工作量", align: "center", colspan: 1, rowspan: 1},
+                    {field: "16", title: "金额", align: "center", colspan: 1, rowspan: 1},
+                    {field: "17", title: "收入率", align: "center", colspan: 1, rowspan: 1},
+                    {field: "18", title: "工作量", align: "center", colspan: 1, rowspan: 1},
+                    {field: "19", title: "金额", align: "center", colspan: 1, rowspan: 1},
+                    {field: "20", title: "收入率", align: "center", colspan: 1, rowspan: 1},
+
+                    {field: "21", title: "工作量", align: "center", colspan: 1, rowspan: 1},
+                    {field: "22", title: "金额", align: "center", colspan: 1, rowspan: 1},
+                    {field: "23", title: "收入率", align: "center", colspan: 1, rowspan: 1},
+                    {field: "24", title: "工作量", align: "center", colspan: 1, rowspan: 1},
+                    {field: "25", title: "金额", align: "center", colspan: 1, rowspan: 1},
+                    {field: "26", title: "收入率", align: "center", colspan: 1, rowspan: 1},
+                    {field: "27", title: "工作量", align: "center", colspan: 1, rowspan: 1},
+                    {field: "28", title: "金额", align: "center", colspan: 1, rowspan: 1},
+                    {field: "29", title: "收入率", align: "center", colspan: 1, rowspan: 1}
+                ]
+            ]
+        };
+        $.table.init(options);
+        getSelectDw();
+        $("#dw").change(function () {
+            getSelectZm();
+        });
+        initDate();
+    });
+
+</script>
+</body>
+</html>
